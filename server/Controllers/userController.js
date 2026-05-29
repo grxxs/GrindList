@@ -1,5 +1,8 @@
 import User from "../Models/User.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const saveUser = async (req, res) => {
   const { login, email, password } = req.body;
@@ -27,7 +30,14 @@ const loginUser = async (req, res) => {
     if (!checkPassword) {
       return res.status(401).json({ message: "Błędne hasło" });
     }
-    res.status(200).json({ message: "Pomyślnie zalogowano" });
+    const payLoad = {
+      userId: foundUser._id.toString(),
+      userLogin: foundUser.login,
+    };
+    const accessToken = jwt.sign(payLoad, process.env.ACCESS_TOKEN_KEY);
+    res
+      .status(200)
+      .json({ message: "Pomyślnie zalogowano", token: accessToken });
   } catch (err) {
     console.log(err);
     res.status(500).json({
