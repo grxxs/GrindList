@@ -3,10 +3,12 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import { dbConnect } from "./Database/db.js";
 import router from "./Routes/authRoutes.js";
+import cookieParser from "cookie-parser";
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
+app.use(cookieParser());
 app.use("/auth", router);
 
 app.get("/", (req, res) => {

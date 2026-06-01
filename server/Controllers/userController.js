@@ -35,9 +35,8 @@ const loginUser = async (req, res) => {
       userLogin: foundUser.login,
     };
     const accessToken = jwt.sign(payLoad, process.env.ACCESS_TOKEN_KEY);
-    res
-      .status(200)
-      .json({ message: "Pomyślnie zalogowano", token: accessToken });
+    res.cookie("JWT", accessToken, { httpOnly: true });
+    res.status(200).json({ message: "Zalogowano" });
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -46,4 +45,9 @@ const loginUser = async (req, res) => {
   }
 };
 
-export { saveUser, loginUser };
+const getCookie = async (req, res) => {
+  const cookie = req.cookies["JWT"];
+  res.json({ message: `Cookie ${cookie}` });
+};
+
+export { saveUser, loginUser, getCookie };
