@@ -1,21 +1,10 @@
 import express from "express";
-import {
-  saveUser,
-  loginUser,
-  getCookie,
-} from "../Controllers/userController.js";
-const router = express.Router();
+import userMethods from "../Controllers/userController.js";
+const routerAuth = express.Router();
 
-router.post("/register", (req, res) => {
-  saveUser(req, res);
-});
+routerAuth.post("/register", userMethods.saveUser);
+routerAuth.post("/login", userMethods.loginUser);
+routerAuth.get("/test", userMethods.getCookie);
+routerAuth.get("/logout", userMethods.logoutUser);
 
-router.post("/login", (req, res) => {
-  loginUser(req, res);
-});
-
-router.get("/test", (req, res) => {
-  getCookie(req, res);
-});
-
-export default router;
+export default routerAuth;

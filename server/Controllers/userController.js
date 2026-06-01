@@ -47,7 +47,31 @@ const loginUser = async (req, res) => {
 
 const getCookie = async (req, res) => {
   const cookie = req.cookies["JWT"];
-  res.json({ message: `Cookie ${cookie}` });
+  res.status(200).json({ message: `Cookie ${cookie}` });
 };
 
-export { saveUser, loginUser, getCookie };
+const logoutUser = async (req, res) => {
+  try {
+    const cookie = req.cookies["JWT"];
+    if (!cookie) {
+      return res
+        .status(400)
+        .json({ message: "Użytkownik nie jest zalogowany" });
+    }
+    res.clearCookie("JWT");
+    res.status(200).json({ message: "Wylogowano" });
+  } catch (err) {
+    res.status(500).json({
+      message: `Nastąpił błąd ${err}`,
+    });
+  }
+};
+
+const userMethods = {
+  saveUser,
+  loginUser,
+  getCookie,
+  logoutUser,
+};
+
+export default userMethods;
