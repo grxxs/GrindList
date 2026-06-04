@@ -61,8 +61,9 @@ const logoutUser = async (req, res) => {
     res.clearCookie("JWT");
     res.status(200).json({ message: "Wylogowano" });
   } catch (err) {
+    console.log(err);
     res.status(500).json({
-      message: `Nastąpił błąd ${err}`,
+      message: `Nastąpił błąd`,
     });
   }
 };
