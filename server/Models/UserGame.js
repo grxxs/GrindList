@@ -4,10 +4,12 @@ const { Schema } = mongoose;
 const userGameSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
   gameId: {
     type: Schema.Types.ObjectId,
+    ref: "Game",
     required: true,
   },
   status: {
