@@ -16,8 +16,8 @@ const getUserGames = async (req, res) => {
   }
 };
 
-const gameMethods = {
+const userGamesMethods = {
   getUserGames,
 };
 
-export default gameMethods;
+export default userGamesMethods;

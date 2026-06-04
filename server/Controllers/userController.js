@@ -45,10 +45,10 @@ const loginUser = async (req, res) => {
   }
 };
 
-const getCookie = async (req, res) => {
-  const cookie = req.cookies["JWT"];
-  res.status(200).json({ message: `Cookie ${cookie}` });
-};
+// const getCookie = async (req, res) => {
+//   const cookie = req.cookies["JWT"];
+//   res.status(200).json({ message: `Cookie ${cookie}` });
+// };
 
 const logoutUser = async (req, res) => {
   try {
@@ -70,7 +70,7 @@ const logoutUser = async (req, res) => {
 const userMethods = {
   saveUser,
   loginUser,
-  getCookie,
+  // getCookie,
   logoutUser,
 };
 
