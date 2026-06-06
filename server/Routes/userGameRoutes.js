@@ -5,6 +5,8 @@ const routerUserGames = express.Router();
 
 routerUserGames.use(verifyJWTToken);
 routerUserGames.get("/list", userGamesMethods.getUserGames);
+routerUserGames.put("/modify/:id", userGamesMethods.modifyUserGame);
+routerUserGames.delete("/delete/:id", userGamesMethods.modifyUserGame);
 routerUserGames.post("/add", userGamesMethods.addUserGame);
 
 export default routerUserGames;
