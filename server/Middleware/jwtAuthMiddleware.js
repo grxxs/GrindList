@@ -12,9 +12,8 @@ const verifyJWTToken = async (req, res, next) => {
     req.userId = jwtToken.userId;
     next();
   } catch (err) {
-    return res
-      .status(401)
-      .json({ message: `Wystąpił nieoczekiwany błąd: ${err}` });
+    console.log(err);
+    return res.status(401).json({ message: `Nieprawidłowy lub wygasły token` });
   }
 };
 

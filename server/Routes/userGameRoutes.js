@@ -5,5 +5,6 @@ const routerUserGames = express.Router();
 
 routerUserGames.use(verifyJWTToken);
 routerUserGames.get("/list", userGamesMethods.getUserGames);
+routerUserGames.post("/add", userGamesMethods.addUserGame);
 
 export default routerUserGames;

@@ -12,7 +12,7 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cookieParser());
 app.use("/auth", routerAuth);
-app.use("/user", routerUserGames);
+app.use("/user-games", routerUserGames);
 app.use("/games", routerGames);
 
 app.get("/", (req, res) => {
