@@ -5,16 +5,66 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const saveUser = async (req, res) => {
-  const { login, email, password } = req.body;
   try {
+    let { login, email, password } = req.body;
+
+    if (!login || !email || !password) {
+      return res.status(400).json({ message: "Wszystkie pola są wymagane" });
+    }
+
+    login = login.trim();
+    email = email.trim().toLowerCase();
+
+    if (login.length < 3 || login.length > 30) {
+      return res
+        .status(400)
+        .json({ message: "Login musi mieć od 3 do 30 znaków" });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Hasło musi mieć minimum 6 znaków" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Niepoprawny adres email" });
+    }
+
+    const foundUser = await User.findOne({
+      $or: [{ login: login }, { email: email }],
+    });
+
+    if (foundUser) {
+      return res.status(409).json({
+        message: "Użytkownik o takim loginie lub emailu już istnieje",
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ login, email, password: hashedPassword });
+
+    const newUser = new User({
+      login,
+      email,
+      password: hashedPassword,
+    });
+
     const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
+
+    res.status(201).json({
+      message: "Użytkownik został zarejestrowany",
+      user: {
+        id: savedUser._id,
+        login: savedUser.login,
+        email: savedUser.email,
+      },
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: `Zapis użytkownika zakończył się niepowodzeniem`,
+      message: "Zapis użytkownika zakończył się niepowodzeniem",
     });
   }
 };
