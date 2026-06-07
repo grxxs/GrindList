@@ -22,10 +22,6 @@ app.use("/auth", routerAuth);
 app.use("/user-games", routerUserGames);
 app.use("/games", routerGames);
 
-app.get("/", (req, res) => {
-  res.send("Hi");
-});
-
 dbConnect();
 
 app.listen(port, () => {
