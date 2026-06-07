@@ -4,9 +4,9 @@ import verifyJWTToken from "../Middleware/jwtAuthMiddleware.js";
 const routerUserGames = express.Router();
 
 routerUserGames.use(verifyJWTToken);
-routerUserGames.get("/list", userGamesMethods.getUserGames);
-routerUserGames.put("/modify/:id", userGamesMethods.modifyUserGame);
-routerUserGames.delete("/delete/:id", userGamesMethods.deleteUserGame);
-routerUserGames.post("/add", userGamesMethods.addUserGame);
+routerUserGames.get("/", userGamesMethods.getUserGames);
+routerUserGames.post("/", userGamesMethods.addUserGame);
+routerUserGames.put("/:id", userGamesMethods.modifyUserGame);
+routerUserGames.delete("/:id", userGamesMethods.deleteUserGame);
 
 export default routerUserGames;

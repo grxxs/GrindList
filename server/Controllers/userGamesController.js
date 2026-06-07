@@ -8,9 +8,7 @@ const getUserGames = async (req, res) => {
     const userId = req.userId;
     const gameList = await UserGame.find({
       userId: userId,
-    })
-      .populate("gameId")
-      .select("gameId");
+    }).populate("gameId");
     if (gameList.length === 0) {
       return res
         .status(200)
