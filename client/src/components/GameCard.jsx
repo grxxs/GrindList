@@ -1,17 +1,61 @@
+import { Link } from "react-router-dom";
+
+function formatDate(dateValue) {
+  if (!dateValue) {
+    return "Brak danych";
+  }
+
+  return String(dateValue).split("T")[0];
+}
+
+function showValue(value) {
+  if (value || value === 0) {
+    return value;
+  }
+
+  return "Brak danych";
+}
+
 function GameCard({ game, onAdd }) {
   return (
-    <div>
-      {game.cover && <img src={game.cover} alt={game.title} width="120" />}
+    <div className="game-card">
+      {game.cover ? (
+        <img src={game.cover} alt={game.title} />
+      ) : (
+        <div className="cover-placeholder">Brak okładki</div>
+      )}
 
-      <h3>{game.title}</h3>
+      <div className="game-card-body">
+        <h3>{game.title}</h3>
 
-      <p>Premiera: {game.releaseDate || "Brak danych"}</p>
-      <p>RAWG rating: {game.rawgRating || "Brak danych"}</p>
-      <p>Metacritic: {game.metacritic || "Brak danych"}</p>
+        <div className="game-meta">
+          <p>
+            <span>Premiera</span>
+            {formatDate(game.releaseDate)}
+          </p>
+          <p>
+            <span>RAWG</span>
+            {showValue(game.rawgRating)}
+          </p>
+          <p>
+            <span>Metacritic</span>
+            {showValue(game.metacritic)}
+          </p>
+        </div>
+      </div>
 
-      <button onClick={() => onAdd(game)}>Dodaj do listy</button>
-
-      <hr />
+      <div className="card-actions">
+        <Link
+          className="secondary-button"
+          to={`/games/${game.rawgId}`}
+          state={{ game }}
+        >
+          Szczegóły
+        </Link>
+        <button type="button" onClick={() => onAdd(game)}>
+          Dodaj do listy
+        </button>
+      </div>
     </div>
   );
 }

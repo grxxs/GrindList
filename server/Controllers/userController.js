@@ -15,22 +15,29 @@ const saveUser = async (req, res) => {
     login = login.trim();
     email = email.trim().toLowerCase();
 
-    if (login.length < 3 || login.length > 30) {
+    if (login.length < 5 || login.length > 30) {
       return res
         .status(400)
-        .json({ message: "Login musi mieć od 3 do 30 znaków" });
-    }
-
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Hasło musi mieć minimum 6 znaków" });
+        .json({ message: "Login musi mieć od 5 do 30 znaków" });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)/;
 
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Niepoprawny adres email" });
+    }
+
+    if (password.length < 9) {
+      return res
+        .status(400)
+        .json({ message: "Hasło musi mieć minimum 9 znaków" });
+    }
+
+    if (!passwordRegex.test(password)) {
+      return res
+        .status(400)
+        .json({ message: "Hasło musi zawierać dużą literę i cyfrę" });
     }
 
     const foundUser = await User.findOne({
@@ -95,10 +102,28 @@ const loginUser = async (req, res) => {
   }
 };
 
-// const getCookie = async (req, res) => {
-//   const cookie = req.cookies["JWT"];
-//   res.status(200).json({ message: `Cookie ${cookie}` });
-// };
+const getLoggedUser = async (req, res) => {
+  try {
+    const foundUser = await User.findById(req.userId).select("-password");
+
+    if (!foundUser) {
+      return res.status(404).json({ message: "Nie znaleziono użytkownika" });
+    }
+
+    res.status(200).json({
+      user: {
+        id: foundUser._id,
+        login: foundUser.login,
+        email: foundUser.email,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Błąd podczas pobierania użytkownika",
+    });
+  }
+};
 
 const logoutUser = async (req, res) => {
   try {
@@ -121,7 +146,7 @@ const logoutUser = async (req, res) => {
 const userMethods = {
   saveUser,
   loginUser,
-  // getCookie,
+  getLoggedUser,
   logoutUser,
 };
 

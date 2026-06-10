@@ -1,47 +1,68 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 
 function Login() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const location = useLocation();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState(
+    location.state?.message || "",
+  );
+  const { login: loginUser } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const response = await fetch("http://localhost:5000/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ login, password }),
-    });
+    const trimmedLogin = login.trim();
 
-    const data = await response.json();
+    if (!trimmedLogin) {
+      setErrorMessage("Login jest wymagany");
+      setSuccessMessage("");
+      return;
+    }
 
-    if (response.ok) {
-      console.log(`Zalogowano: ${data.message}`);
-    } else {
-      console.log(`Błąd: ${data.message}`);
+    if (!password) {
+      setErrorMessage("Hasło jest wymagane");
+      setSuccessMessage("");
+      return;
+    }
+
+    try {
+      setErrorMessage("");
+      setSuccessMessage("");
+
+      await loginUser(trimmedLogin, password);
+      navigate("/library");
+    } catch (err) {
+      setErrorMessage(err.message);
     }
   };
 
   return (
-    <div>
+    <div className="form-page">
       <h1>Logowanie</h1>
 
-      <form onSubmit={handleSubmit}>
+      {errorMessage && <p className="message error">{errorMessage}</p>}
+      {successMessage && <p className="message success">{successMessage}</p>}
+
+      <form className="form-card" onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Login"
           value={login}
           onChange={(event) => setLogin(event.target.value)}
         />
-        <br />
+
         <input
           type="password"
           placeholder="Hasło"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
-        <br />
+
         <button type="submit">Zaloguj</button>
       </form>
     </div>

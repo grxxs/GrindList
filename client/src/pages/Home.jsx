@@ -6,32 +6,48 @@ import GameCard from "../components/GameCard";
 function Home() {
   const [query, setQuery] = useState("");
   const [games, setGames] = useState([]);
-  const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = async (event) => {
     event.preventDefault();
 
     const trimmedQuery = query.trim();
+    const titleRegex = /^[a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s\-:'’]+$/;
 
     if (!trimmedQuery) {
-      setMessage("Wpisz nazwę gry");
+      setErrorMessage("Wpisz nazwę gry");
+      setSuccessMessage("");
+      return;
+    }
+
+    if (trimmedQuery.length > 50) {
+      setErrorMessage("Tytuł może mieć maksymalnie 50 znaków");
+      setSuccessMessage("");
+      return;
+    }
+
+    if (!titleRegex.test(trimmedQuery)) {
+      setErrorMessage("Tytuł zawiera niedozwolone znaki");
+      setSuccessMessage("");
       return;
     }
 
     try {
       setIsLoading(true);
-      setMessage("");
+      setErrorMessage("");
+      setSuccessMessage("");
 
       const results = await searchGames(trimmedQuery);
 
       setGames(results);
 
       if (results.length === 0) {
-        setMessage("Brak wyników");
+        setErrorMessage("Brak wyników");
       }
     } catch (err) {
-      setMessage(err.message);
+      setErrorMessage(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -40,35 +56,56 @@ function Home() {
   const handleAddGame = async (game) => {
     try {
       const data = await addUserGame(game);
-      setMessage(data.message || "Dodano grę do listy");
+      setErrorMessage("");
+      setSuccessMessage(data.message || "Dodano grę do listy");
     } catch (err) {
-      setMessage(err.message);
+      setSuccessMessage("");
+      setErrorMessage(err.message);
     }
   };
 
   return (
-    <div>
-      <h1>GrindList</h1>
+    <div className="home-page">
+      <section className="hero">
+        <p className="hero-kicker">Backlog gier</p>
+        <h1>GrindList</h1>
+        <p className="hero-text">
+          Odkrywaj nowe tytuły, buduj wymarzoną bibliotekę i miej pełną kontrolę
+          nad swoją kolekcją – od gier w planach, przez te ogrywane, aż po z
+          dumą ukończone.
+        </p>
 
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          placeholder="Wyszukaj grę"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
+        <form className="search-form" onSubmit={handleSearch}>
+          <input
+            type="text"
+            placeholder="Wyszukaj grę"
+            value={query}
+            maxLength="50"
+            onChange={(event) => setQuery(event.target.value)}
+          />
 
-        <button type="submit">Szukaj</button>
-      </form>
+          <button type="submit">Szukaj</button>
+        </form>
+      </section>
 
-      {isLoading && <p>Ładowanie...</p>}
-      {message && <p>{message}</p>}
+      {isLoading && <p className="message">Ładowanie...</p>}
+      {errorMessage && <p className="message error">{errorMessage}</p>}
+      {successMessage && <p className="message success">{successMessage}</p>}
 
-      <div>
-        {games.map((game) => (
-          <GameCard key={game.rawgId} game={game} onAdd={handleAddGame} />
-        ))}
-      </div>
+      {games.length > 0 && (
+        <section className="results-section">
+          <div className="section-header">
+            <h2>Wyniki wyszukiwania</h2>
+            <span>{games.length} znalezionych</span>
+          </div>
+
+          <div className="games-grid">
+            {games.map((game) => (
+              <GameCard key={game.rawgId} game={game} onAdd={handleAddGame} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

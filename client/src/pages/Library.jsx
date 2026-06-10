@@ -8,30 +8,52 @@ import UserGameCard from "../components/UserGameCard";
 
 function Library() {
   const [userGames, setUserGames] = useState([]);
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const plannedCount = userGames.filter((game) => game.status === "planned").length;
+  const playingCount = userGames.filter((game) => game.status === "playing").length;
+  const completedCount = userGames.filter(
+    (game) => game.status === "completed",
+  ).length;
+  const droppedCount = userGames.filter((game) => game.status === "dropped").length;
 
   const loadLibrary = async () => {
     try {
       setIsLoading(true);
-      setMessage("");
+      setErrorMessage("");
+      setSuccessMessage("");
 
       const games = await getUserGames();
 
       setUserGames(games);
 
       if (games.length === 0) {
-        setMessage("Brak gier w bibliotece");
+        setSuccessMessage("Brak gier w bibliotece");
       }
     } catch (err) {
-      setMessage(err.message);
+      setErrorMessage(err.message);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadLibrary();
+    getUserGames()
+      .then((games) => {
+        setUserGames(games);
+
+        if (games.length === 0) {
+          setSuccessMessage("Brak gier w bibliotece");
+        }
+      })
+      .catch((err) => {
+        setErrorMessage(err.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   const handleStatusChange = async (userGameId, status) => {
@@ -44,9 +66,11 @@ function Library() {
         ),
       );
 
-      setMessage("Zmieniono status");
+      setErrorMessage("");
+      setSuccessMessage("Zmieniono status");
     } catch (err) {
-      setMessage(err.message);
+      setSuccessMessage("");
+      setErrorMessage(err.message);
     }
   };
 
@@ -58,22 +82,55 @@ function Library() {
         previousGames.filter((userGame) => userGame._id !== userGameId),
       );
 
-      setMessage("Usunięto grę z listy");
+      setErrorMessage("");
+      setSuccessMessage("Usunięto grę z listy");
     } catch (err) {
-      setMessage(err.message);
+      setSuccessMessage("");
+      setErrorMessage(err.message);
     }
   };
 
   return (
-    <div>
-      <h1>Moja biblioteka</h1>
+    <div className="library-page">
+      <div className="page-title-row">
+        <div>
+          <p className="hero-kicker">Twoje gry</p>
+          <h1>Moja biblioteka</h1>
+        </div>
 
-      <button onClick={loadLibrary}>Odśwież</button>
+        <button type="button" onClick={loadLibrary}>
+          Odśwież
+        </button>
+      </div>
 
-      {isLoading && <p>Ładowanie...</p>}
-      {message && <p>{message}</p>}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <span>Łącznie</span>
+          <strong>{userGames.length}</strong>
+        </div>
+        <div className="stat-card">
+          <span>Planowane</span>
+          <strong>{plannedCount}</strong>
+        </div>
+        <div className="stat-card">
+          <span>W trakcie</span>
+          <strong>{playingCount}</strong>
+        </div>
+        <div className="stat-card">
+          <span>Ukończone</span>
+          <strong>{completedCount}</strong>
+        </div>
+        <div className="stat-card">
+          <span>Porzucone</span>
+          <strong>{droppedCount}</strong>
+        </div>
+      </div>
 
-      <div>
+      {isLoading && <p className="message">Ładowanie...</p>}
+      {errorMessage && <p className="message error">{errorMessage}</p>}
+      {successMessage && <p className="message success">{successMessage}</p>}
+
+      <div className="games-grid">
         {userGames.map((userGame) => (
           <UserGameCard
             key={userGame._id}
