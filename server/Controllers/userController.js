@@ -4,6 +4,14 @@ import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 dotenv.config();
 
+const accessTokenExpiresIn = "1h";
+const authCookieMaxAge = 60 * 60 * 1000;
+const authCookieOptions = {
+  httpOnly: true,
+  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production",
+};
+
 const saveUser = async (req, res) => {
   try {
     let { login, email, password } = req.body;
@@ -18,14 +26,14 @@ const saveUser = async (req, res) => {
     if (login.length < 5 || login.length > 30) {
       return res
         .status(400)
-        .json({ message: "Login musi mieć od 5 do 30 znaków" });
+        .json({ message: "Nazwa użytkownika musi mieć od 5 do 30 znaków" });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)/;
 
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Niepoprawny adres email" });
+      return res.status(400).json({ message: "Niepoprawny adres e-mail" });
     }
 
     if (password.length < 9) {
@@ -46,7 +54,7 @@ const saveUser = async (req, res) => {
 
     if (foundUser) {
       return res.status(409).json({
-        message: "Użytkownik o takim loginie lub emailu już istnieje",
+        message: "Użytkownik o takiej nazwie lub adresie e-mail już istnieje",
       });
     }
 
@@ -77,9 +85,24 @@ const saveUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  const { login, password } = req.body;
   try {
-    const foundUser = await User.findOne({ login: login });
+    const { login, password } = req.body;
+
+    if (!login || !password) {
+      return res
+        .status(400)
+        .json({ message: "Nazwa użytkownika i hasło są wymagane" });
+    }
+
+    const trimmedLogin = login.trim();
+
+    if (!trimmedLogin) {
+      return res
+        .status(400)
+        .json({ message: "Nazwa użytkownika jest wymagana" });
+    }
+
+    const foundUser = await User.findOne({ login: trimmedLogin });
     if (!foundUser) {
       return res.status(401).json({ message: "Nie znaleziono użytkownika" });
     }
@@ -91,8 +114,13 @@ const loginUser = async (req, res) => {
       userId: foundUser._id.toString(),
       userLogin: foundUser.login,
     };
-    const accessToken = jwt.sign(payLoad, process.env.ACCESS_TOKEN_KEY);
-    res.cookie("JWT", accessToken, { httpOnly: true });
+    const accessToken = jwt.sign(payLoad, process.env.ACCESS_TOKEN_KEY, {
+      expiresIn: accessTokenExpiresIn,
+    });
+    res.cookie("JWT", accessToken, {
+      ...authCookieOptions,
+      maxAge: authCookieMaxAge,
+    });
     res.status(200).json({ message: "Zalogowano" });
   } catch (err) {
     console.log(err);
@@ -133,7 +161,7 @@ const logoutUser = async (req, res) => {
         .status(400)
         .json({ message: "Użytkownik nie jest zalogowany" });
     }
-    res.clearCookie("JWT");
+    res.clearCookie("JWT", authCookieOptions);
     res.status(200).json({ message: "Wylogowano" });
   } catch (err) {
     console.log(err);

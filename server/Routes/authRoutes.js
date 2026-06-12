@@ -6,6 +6,6 @@ const routerAuth = express.Router();
 routerAuth.post("/register", userMethods.saveUser);
 routerAuth.post("/login", userMethods.loginUser);
 routerAuth.get("/me", verifyJWTToken, userMethods.getLoggedUser);
-routerAuth.get("/logout", userMethods.logoutUser);
+routerAuth.post("/logout", userMethods.logoutUser);
 
 export default routerAuth;

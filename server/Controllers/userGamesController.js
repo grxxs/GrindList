@@ -86,7 +86,9 @@ const modifyUserGame = async (req, res) => {
       userId: userId,
     });
     if (!gameToModify) {
-      return res.status(404).json({ message: "Nie znaleziono gry" });
+      return res
+        .status(404)
+        .json({ message: "Nie znaleziono tej gry w Twojej bibliotece" });
     }
     if (gameToModify.status === sentStatus) {
       return res.status(409).json({ message: "Należy wybrać inny status" });
@@ -113,7 +115,7 @@ const deleteUserGame = async (req, res) => {
     if (!foundGame) {
       return res
         .status(404)
-        .json({ message: "Nie znaleziono gry do usunięcia" });
+        .json({ message: "Nie znaleziono tej gry w Twojej bibliotece" });
     }
     res.status(200).json({ message: "Usunięto grę z listy" });
   } catch (err) {

@@ -19,7 +19,7 @@ function Login() {
     const trimmedLogin = login.trim();
 
     if (!trimmedLogin) {
-      setErrorMessage("Login jest wymagany");
+      setErrorMessage("Nazwa użytkownika jest wymagana");
       setSuccessMessage("");
       return;
     }
@@ -51,7 +51,7 @@ function Login() {
       <form className="form-card" onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Login"
+          placeholder="Nazwa użytkownika"
           value={login}
           onChange={(event) => setLogin(event.target.value)}
         />

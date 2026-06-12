@@ -14,7 +14,7 @@ function Navbar() {
     <nav className="navbar">
       <div className="navbar-inner">
         <Link className="navbar-logo" to="/">
-          <img src="/Logo.png" alt="GrindList logo" />
+          <img src="/Logo.png" alt="Logo GrindList" />
           <span className="brand-text">
             Grind<span className="brand-gradient">List</span>
           </span>
@@ -30,9 +30,9 @@ function Navbar() {
 
           {!isAuthLoading && !user && (
             <>
-              <Link to="/login">Login</Link>
+              <Link to="/login">Logowanie</Link>
               <Link className="auth-button" to="/register">
-                Register
+                Rejestracja
               </Link>
             </>
           )}
@@ -41,7 +41,7 @@ function Navbar() {
             <>
               <span className="user-pill">Zalogowany: {user.login}</span>
               <button type="button" className="link-button" onClick={handleLogout}>
-                Logout
+                Wyloguj
               </button>
             </>
           )}

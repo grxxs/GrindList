@@ -2,6 +2,7 @@ import { useState } from "react";
 import { searchGames } from "../api/gamesApi";
 import { addUserGame } from "../api/userGamesApi";
 import GameCard from "../components/GameCard";
+import { useAuth } from "../context/useAuth";
 
 function Home() {
   const [query, setQuery] = useState("");
@@ -9,6 +10,7 @@ function Home() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
   const handleSearch = async (event) => {
     event.preventDefault();
@@ -54,6 +56,12 @@ function Home() {
   };
 
   const handleAddGame = async (game) => {
+    if (!user) {
+      setSuccessMessage("");
+      setErrorMessage("Zaloguj się, aby dodać grę do biblioteki");
+      return;
+    }
+
     try {
       const data = await addUserGame(game);
       setErrorMessage("");
@@ -67,8 +75,10 @@ function Home() {
   return (
     <div className="home-page">
       <section className="hero">
-        <p className="hero-kicker">Backlog gier</p>
-        <h1>GrindList</h1>
+        <p className="hero-kicker">Lista gier</p>
+        <h1>
+          Grind<span className="brand-gradient">List</span>
+        </h1>
         <p className="hero-text">
           Odkrywaj nowe tytuły, buduj wymarzoną bibliotekę i miej pełną kontrolę
           nad swoją kolekcją – od gier w planach, przez te ogrywane, aż po z

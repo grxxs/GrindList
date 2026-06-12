@@ -40,6 +40,7 @@ export const registerUser = async (login, email, password) => {
 
 export const logoutUser = async () => {
   const response = await fetch(`${API_URL}/auth/logout`, {
+    method: "POST",
     credentials: "include",
   });
 

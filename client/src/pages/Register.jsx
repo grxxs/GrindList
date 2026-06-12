@@ -19,22 +19,22 @@ function Register() {
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)/;
 
     if (!trimmedLogin) {
-      setErrorMessage("Login jest wymagany");
+      setErrorMessage("Nazwa użytkownika jest wymagana");
       return;
     }
 
     if (trimmedLogin.length < 5 || trimmedLogin.length > 30) {
-      setErrorMessage("Login musi mieć od 5 do 30 znaków");
+      setErrorMessage("Nazwa użytkownika musi mieć od 5 do 30 znaków");
       return;
     }
 
     if (!trimmedEmail) {
-      setErrorMessage("Email jest wymagany");
+      setErrorMessage("Adres e-mail jest wymagany");
       return;
     }
 
     if (!emailRegex.test(trimmedEmail)) {
-      setErrorMessage("Niepoprawny adres email");
+      setErrorMessage("Niepoprawny adres e-mail");
       return;
     }
 
@@ -76,14 +76,14 @@ function Register() {
       <form className="form-card" onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Login"
+          placeholder="Nazwa użytkownika"
           value={login}
           onChange={(event) => setLogin(event.target.value)}
         />
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Adres e-mail"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
         />

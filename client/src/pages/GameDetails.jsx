@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { addUserGame } from "../api/userGamesApi";
+import { useAuth } from "../context/useAuth";
 
 function formatDate(dateValue) {
   if (!dateValue) {
@@ -49,8 +50,15 @@ function GameDetails() {
   const game = location.state?.game;
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const { user } = useAuth();
 
   const handleAddGame = async () => {
+    if (!user) {
+      setSuccessMessage("");
+      setErrorMessage("Zaloguj się, aby dodać grę do biblioteki");
+      return;
+    }
+
     try {
       const data = await addUserGame(game);
       setErrorMessage("");
